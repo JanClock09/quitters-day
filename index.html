@@ -283,3 +283,30 @@
 </script>
 </body>
 </html>
+<!-- SHARE BUTTONS -->
+<div style="text-align:center; margin-top:30px;">
+  <h3>Share this page</h3>
+
+  <!-- Twitter -->
+  <a href="https://twitter.com/intent/tweet?text=Check%20out%20Quitters%20Day!&url=https://janclock09.github.io/quitters-day/"
+     target="_blank" style="margin: 5px;">
+    <button>🐦 Share on Twitter</button>
+  </a>
+
+  <!-- Facebook -->
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https://janclock09.github.io/quitters-day/"
+     target="_blank" style="margin: 5px;">
+    <button>📘 Share on Facebook</button>
+  </a>
+
+  <!-- Copy Link -->
+  <button id="copyLinkBtn" style="margin: 5px;">📋 Copy Link</button>
+</div>
+
+<script>
+document.getElementById('copyLinkBtn').addEventListener('click', function() {
+  navigator.clipboard.writeText(window.location.href).then(function() {
+    alert('Link copied to clipboard!');
+  });
+});
+</script>
