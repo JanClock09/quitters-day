@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Quitters Day Countdown</title>
+  <meta name="description" content="A lock-screen style countdown to Quitters Day (Jan 9). Satirical excuses included." />
   <style>
     :root{
       --bg1:#070A12;
@@ -13,6 +14,7 @@
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.65);
       --shadow: 0 20px 60px rgba(0,0,0,.55);
+      --ok: rgba(43,255,184,.22);
     }
     *{box-sizing:border-box}
     body{
@@ -57,8 +59,8 @@
     .big{
       text-align:center;
       font-weight:650;
-      font-size:64px;
-      line-height:1;
+      font-size:56px;
+      line-height:1.05;
       margin:4px 0 10px;
       text-shadow: 0 10px 30px rgba(0,0,0,.45);
     }
@@ -102,6 +104,16 @@
       line-height:1.35;
     }
     .meme b{color:var(--text)}
+    .caption{
+      margin-top:10px;
+      padding:12px 14px;
+      border-radius:18px;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
     .footer{
       display:flex;
       justify-content:space-between;
@@ -109,13 +121,32 @@
       margin-top:12px;
       color:var(--muted);
       font-size:12px;
+      flex-wrap:wrap;
     }
-    .pill{
+    .pill, button.pill{
       padding:8px 10px;
       border-radius:999px;
       background: rgba(0,0,0,.25);
       border:1px solid rgba(255,255,255,.10);
       white-space:nowrap;
+      color:inherit;
+      font:inherit;
+      cursor:default;
+    }
+    button.pill{
+      cursor:pointer;
+      user-select:none;
+    }
+    button.pill:active{ transform: translateY(1px); }
+    .toast{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(43,255,184,.16), rgba(255,255,255,.05));
+      color:var(--text);
+      font-size:13px;
+      display:none;
     }
     a{color:inherit}
   </style>
@@ -140,9 +171,20 @@
       <span id="snark">calculating excuses per second…</span>
     </div>
 
+    <!-- “All the above”: pen description + post caption you can copy/paste -->
+    <div class="caption" id="captionBox">
+      <b>Pen description:</b> A fake “lock screen” countdown to Quitters Day (Jan 9) — the sacred moment when New Year’s resolutions
+      quietly get left on read. Minimal glassmorphism, maximum cope.<br><br>
+      <b>Satirical post:</b> “Live countdown to Quitters Day (Jan 9). If you need me I’ll be reorganising my life instead of living it. 🫡
+      Excuses are updating in real-time.”
+    </div>
+
+    <div class="toast" id="toast">Copied link ✅</div>
+
     <div class="footer">
       <div class="pill" id="targetLine">Target: Jan 9</div>
       <div class="pill" id="tzLine">Timezone: local</div>
+      <button class="pill" id="shareBtn" type="button" aria-label="Share this page">Share</button>
     </div>
   </main>
 
@@ -201,6 +243,40 @@
     const idx = Math.floor((now.getTime()/1000) % snark.length);
     el("snark").textContent = snark[idx];
   }
+
+  async function sharePage(){
+    const url = window.location.href;
+    const title = "Quitters Day Countdown";
+    const text = "Live lock-screen countdown to Quitters Day (Jan 9). Excuses updating in real-time.";
+
+    try{
+      if(navigator.share){
+        await navigator.share({ title, text, url });
+        return;
+      }
+      // Fallback: copy link
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(url);
+      } else {
+        // Older fallback
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        ta.setAttribute("readonly","");
+        ta.style.position = "fixed";
+        ta.style.top = "-1000px";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      el("toast").style.display = "block";
+      setTimeout(()=>{ el("toast").style.display="none"; }, 1600);
+    }catch(e){
+      // If share/copy is blocked, do nothing (no errors shown)
+    }
+  }
+
+  el("shareBtn").addEventListener("click", sharePage);
 
   tick();
   setInterval(tick, 250);
